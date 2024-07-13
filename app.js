@@ -8,6 +8,7 @@ class Utilities {
     }
 
     static renderPage() {
+        // register
         const $registerForm = document.getElementById('registerForm');
         const $inputName = document.getElementById('user_name');
         const $inputEmail = document.getElementById('user_email');
@@ -25,6 +26,7 @@ class Utilities {
                 const promptKey = Number(prompt("Enter Admin Key"))
                 if (!promptKey) {
                     alert('You should enter a key')
+                    return;
                 }
                 if (promptKey !== 123456){
                     alert("Invalid Key")
@@ -32,10 +34,12 @@ class Utilities {
                 }
 
                 AdminUser.createAdminUser(promptKey, $inputName.value, $inputEmail.value, $inputPassword.value);
-                console.log(Person.users);
+                // console.log(Person.users);
+                const token = "adminToken"
+                localStorage.setItem('token', token)
+                localStorage.setItem('users', Person.users)
+                window.location.href = 'admin.html'
                 
-                
-    
             });
 
         // user
@@ -46,10 +50,17 @@ class Utilities {
                     alert('You should fill all the fields')
                 } else {
                     Person.createUser($inputName.value, $inputEmail.value, $inputPassword.value);
-                    console.log(Person.users);
+                    const token = "userToken"
+                    localStorage.setItem('token', token)
+                    window.location.href = 'users.html'
+                    // console.log(Person.users);
                 }
 
             });
+
+        //login
+        const $loginForm = document.getElementById('loginForm');
+        const $loginEmail = document.getElementById('login_email')
         
         
 
@@ -75,15 +86,20 @@ class Person {
     }
 
     static createUser(name, email, password) {
-        const newUser = new RegulaUser(name, email, password)
-        this.users.push(newUser)
+        const newUser = new RegularUser(name, email, password)
+        Person.users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(Person.users));
     }
+
 
 }
 
-class RegulaUser extends Person {
+class RegularUser extends Person {
     constructor(id, name, email, password) {
         super(id, name, email, password);
+    }
+    register(){
+        super.register();
     }
 }
 
