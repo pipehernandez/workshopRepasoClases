@@ -60,7 +60,20 @@ class Utilities {
 
         //login
         const $loginForm = document.getElementById('loginForm');
-        const $loginEmail = document.getElementById('login_email')
+        const $loginEmail = document.getElementById('login_email');
+        const $loginPassword = document.getElementById('login_password');
+        $loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = localStorage.getItem('users')
+            console.log(user)
+            // if (!user) {
+            //     alert('User not found')
+            // } else {
+            //     const token = "userToken"
+            //     localStorage.setItem('token', token)
+            //     window.location.href = 'users.html'
+            // }
+        })
         
         
 
