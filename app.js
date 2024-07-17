@@ -1,6 +1,6 @@
 class Utilities {
     static generateId() {
-        let increment = 0
+        let increment = 1
         return function () {
             return increment++
 
@@ -15,6 +15,7 @@ class Utilities {
         const $inputPassword = document.getElementById('user_password');
         const $buttonRegister = document.getElementById('button_register');
         const $buttonAdmin = document.getElementById('button_register_admin');
+        
 
         // admin
             $buttonAdmin.addEventListener('click', (e) => {
@@ -34,12 +35,9 @@ class Utilities {
                 }
 
                 AdminUser.createAdminUser(promptKey, $inputName.value, $inputEmail.value, $inputPassword.value);
-                // console.log(Person.users);
-                const token = "adminToken"
-                localStorage.setItem('token', token)
-                localStorage.setItem('users', Person.users)
-                window.location.href = 'admin.html'
-                
+                $inputName.value = "";
+                $inputEmail.value = "";
+                $inputPassword.value = "";
             });
 
         // user
@@ -50,10 +48,10 @@ class Utilities {
                     alert('You should fill all the fields')
                 } else {
                     Person.createUser($inputName.value, $inputEmail.value, $inputPassword.value);
-                    const token = "userToken"
-                    localStorage.setItem('token', token)
-                    window.location.href = 'users.html'
-                    // console.log(Person.users);
+                    $inputName.value = "";
+                    $inputEmail.value = "";
+                    $inputPassword.value = "";
+                    // return;
                 }
 
             });
@@ -65,14 +63,20 @@ class Utilities {
         $loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const user = localStorage.getItem('users')
-            console.log(user)
-            // if (!user) {
-            //     alert('User not found')
-            // } else {
-            //     const token = "userToken"
-            //     localStorage.setItem('token', token)
-            //     window.location.href = 'users.html'
-            // }
+            if (!user) {
+                alert('There are no users registered')
+            } else {
+                const users = JSON.parse(user);
+                const admin = users.find(user => user.role === "admin")
+                if (admin){
+                    // console.log("si es admin")
+                    if (admin.email === $loginEmail.value && admin.password === $loginPassword.value) {
+                        alert("Logged as admin")
+                    } else {
+                        alert("Invalid email or password")
+                    }
+                }
+            }
         })
         
         
@@ -101,7 +105,7 @@ class Person {
     static createUser(name, email, password) {
         const newUser = new RegularUser(name, email, password)
         Person.users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(Person.users));
+        localStorage.setItem('users', JSON.stringify(this.users));
     }
 
 
@@ -111,15 +115,13 @@ class RegularUser extends Person {
     constructor(id, name, email, password) {
         super(id, name, email, password);
     }
-    register(){
-        super.register();
-    }
 }
 
 class AdminUser extends Person {
     static #adminKey = 123456
     constructor(name, email, password) {
         super(name, email, password);
+        this.role = "admin";
 
     }
 
@@ -128,6 +130,7 @@ class AdminUser extends Person {
         if (adminKeySent === this.#adminKey) {
             const newAdmin = new AdminUser(name, email, password);
             this.users.push(newAdmin)
+            localStorage.setItem('users', JSON.stringify(Person.users));
         } else {
             throw new Error('Invalid Admin Key');
         }
